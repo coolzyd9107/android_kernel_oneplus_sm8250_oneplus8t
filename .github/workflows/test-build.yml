@@ -13,8 +13,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Kernel Source
-      uses: actions/checkout@v4
+    #- name: Checkout Kernel Source
+      #uses: actions/checkout@v4
 
     - name: Install Build Dependencies
       run: |
@@ -24,11 +24,11 @@ jobs:
         
     - name: Setup zyc-clang Toolchain
       run: |
-        mkdir -p $GITHUB_WORKSPACE/zyc-clang
-        cd $GITHUB_WORKSPACE/zyc-clang
-        wget https://github.com/ZyCromerZ/Clang/releases/download/14.0.6-20220904-release/Clang-14.0.6-20220904.tar.gz
-        tar -xf Clang-14.0.6-20220904.tar.gz
-        rm Clang-14.0.6-20220904.tar.gz
+        mkdir zyc-clang
+        cd zyc-clang
+        wget https://github.com/ZyCromerZ/Clang/releases/download/16.0.6-20260510-release/Clang-16.0.6-20260510.tar.gz
+        tar -zxvf Clang-16.0.6-20260510.tar.gz
+        cd ..
 
     - name: Integrate ReSukiSU Source
       if: ${{ inputs.enable_ksu == true }}
