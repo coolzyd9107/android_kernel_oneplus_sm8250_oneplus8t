@@ -24,6 +24,15 @@ on:
         required: true
         type: boolean
         default: true
+        
+      device:
+        description: 'Target Device Defconfig'
+        required: true
+        default: 'kona-perf'
+        type: choice
+        options:
+          - kona-perf
+          - kona
 
 jobs:
   build:
