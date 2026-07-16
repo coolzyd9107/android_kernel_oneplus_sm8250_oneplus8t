@@ -4,12 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       device:
-        description: 'Target Device Codename'
+        description: 'Target Device Defconfig'
         required: true
-        default: 'kebab'
+        default: 'kona-perf'
         type: choice
         options:
-          - kebab
+          - kona-perf
+          - kona
 
       script:
         description: 'Select Build Script'
@@ -25,15 +26,6 @@ on:
         type: boolean
         default: true
         
-      device:
-        description: 'Target Device Defconfig'
-        required: true
-        default: 'kona-perf'
-        type: choice
-        options:
-          - kona-perf
-          - kona
-
 jobs:
   build:
     name: Build Kernel for ${{ inputs.device }} (${{ inputs.ksu && 'KSU' || 'NoKSU' }})
