@@ -13,8 +13,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Kernel Source
+    - name: Checkout Source
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+        submodules: 'recursive'  # 递归拉取一加内核特有的子模块代码
 
     - name: Install Build Dependencies
       run: |
