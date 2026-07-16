@@ -1,0 +1,116 @@
+name: Build OnePlus 8T Kernel with ReSukiSU
+
+on:
+  workflow_dispatch:
+    inputs:
+      enable_ksu:
+        description: '是否启用 ReSukiSU'
+        required: true
+        default: 'true'
+        type: boolean
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Kernel Source
+      uses: actions/checkout@v4
+
+    - name: Install Build Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bc bison build-essential ccache flex g++-multilib gcc-multilib git gnupg gperf lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.1-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev libtinfo5
+
+    - name: Setup zyc-clang Toolchain
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/zyc-clang
+        cd $GITHUB_WORKSPACE/zyc-clang
+        wget https://github.com/ZyCromerZ/Clang/releases/download/14.0.6-20220904-release/Clang-14.0.6-20220904.tar.gz
+        tar -xf Clang-14.0.6-20220904.tar.gz
+        rm Clang-14.0.6-20220904.tar.gz
+
+    - name: Integrate ReSukiSU Source
+      if: ${{ inputs.enable_ksu == true }}
+      run: |
+        curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/main/kernel/setup.sh" | bash
+
+    - name: Configure and Build Kernel
+      env:
+        CCACHE_DIR: ${{ github.workspace }}/.ccache
+      run: |
+        export PATH="$GITHUB_WORKSPACE/zyc-clang/bin:$PATH"
+        export ARCH=arm64
+        export SUBARCH=arm64
+        
+        MAKE_ARGS="ARCH=arm64 \
+                   SUBARCH=arm64 \
+                   O=out \
+                   CC=clang \
+                   HOSTCC=clang \
+                   CLANG_TRIPLE=aarch64-linux-gnu- \
+                   CROSS_COMPILE=aarch64-linux-gnu- \
+                   CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+                   CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
+                   LD=ld.lld \
+                   AR=llvm-ar \
+                   NM=llvm-nm \
+                   OBJCOPY=llvm-objcopy \
+                   OBJDUMP=llvm-objdump \
+                   STRIP=llvm-strip"
+
+        DEFCONFIG_NAME="vendor/kona-perf_defconfig"
+        if [ ! -f "arch/arm64/configs/${DEFCONFIG_NAME}" ]; then
+            DEFCONFIG_NAME="kona_defconfig"
+        fi
+
+        echo "Using defconfig: $DEFCONFIG_NAME"
+        make $MAKE_ARGS $DEFCONFIG_NAME
+
+        if [ "${{ inputs.enable_ksu }}" = "true" ]; then
+            scripts/config --file out/.config \
+                -e KSU \
+                -e THREAD_INFO_IN_TASK \
+                -e KPROBES \
+                -e HAVE_KPROBES \
+                -e KPROBE_EVENTS \
+                -e KSU_SUSFS \
+                -e KSU_SUSFS_SUS_PATH \
+                -e KSU_SUSFS_SUS_MOUNT \
+                -e KSU_SUSFS_SUS_KSTAT \
+                -e KSU_SUSFS_SPOOF_UNAME \
+                -e KSU_SUSFS_ENABLE_LOG \
+                -e KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS \
+                -e KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG \
+                -e KSU_SUSFS_OPEN_REDIRECT \
+                -e KSU_SUSFS_SUS_MAP \
+                -e KSU_MULTI_MANAGER_SUPPORT
+        else
+            scripts/config --file out/.config -d KSU
+        fi
+
+        make $MAKE_ARGS -j$(nproc)
+
+    - name: Prepare AnyKernel3 & Pack
+      run: |
+        gzip -c9 out/arch/arm64/boot/Image > out/arch/arm64/boot/Image.gz
+        find out/arch/arm64/boot/dts -name '*.dtb' -exec cat {} + > out/arch/arm64/boot/dtb
+        
+        git clone https://github.com/AstideLabs/AnyKernel3 -b master --single-branch --depth=1 anykernel
+        rm -rf anykernel/kernels/
+        mkdir -p anykernel/kernels/aosp/
+        
+        cp out/arch/arm64/boot/Image.gz anykernel/kernels/aosp/
+        cp out/arch/arm64/boot/dtb anykernel/kernels/aosp/
+        [ -f out/arch/arm64/boot/dtbo.img ] && cp out/arch/arm64/boot/dtbo.img anykernel/kernels/aosp/ || echo "No dtbo.img found"
+        
+        cd anykernel
+        KSU_STR=${{ inputs.enable_ksu == true && 'ReSukiSU-SuSFS' || 'NoKernelSU' }}
+        ZIP_NAME="OnePlus8T_Kernel_${KSU_STR}_$(date +'%Y%m%d_%H%M%S').zip"
+        zip -r9 ../$ZIP_NAME ./* -x .git .gitignore out/ ./*.zip
+        echo "ZIP_PATH=$GITHUB_WORKSPACE/$ZIP_NAME" >> $GITHUB_ENV
+
+    - name: Upload Kernel Flashable ZIP
+      uses: actions/artifacts@v4
+      with:
+        name: OnePlus8T-Kernel-Artifact
+        path: ${{ env.ZIP_PATH }}
