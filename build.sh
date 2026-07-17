@@ -42,14 +42,8 @@ if ! command -v clang >/dev/null 2>&1; then
     exit 1
 fi
 
-# Enable ccache for speed up compiling 
-export CCACHE_DIR="$HOME/.cache/ccache_mikernel" 
 export CC="clang"
 export CXX="clang++"
-export PATH="/usr/lib/ccache:$PATH"
-export CCACHE_COMPILERCHECK=content
-export CCACHE_SLOPPINESS=time_macros,include_file_mtime,include_file_ctime
-echo "CCACHE_DIR: [$CCACHE_DIR]"
 
 MAKE_ARGS="ARCH=arm64 \
            SUBARCH=arm64 \

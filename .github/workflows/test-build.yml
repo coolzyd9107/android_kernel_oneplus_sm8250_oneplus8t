@@ -58,16 +58,7 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential git curl bison flex zip bc cpio libssl-dev ccache python3-minimal python-is-python3 libelf-dev libtinfo5 gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu gcc-arm-linux-gnueabi binutils-arm-linux-gnueabi
-
-    - name: Setup Cache (ccache)
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/ccache_mikernel
-        key: kernel-ccache-${{ inputs.device }}-${{ github.run_id }}
-        restore-keys: |
-          kernel-ccache-${{ inputs.device }}-
-          kernel-ccache-
+        sudo apt-get install -y build-essential git curl bison flex zip bc cpio libssl-dev python3-minimal python-is-python3 libelf-dev libtinfo5 gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu gcc-arm-linux-gnueabi binutils-arm-linux-gnueabi
 
     - name: Setup Toolchain (Snapdragon LLVM 10.0.7)
       run: |
