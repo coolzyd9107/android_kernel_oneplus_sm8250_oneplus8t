@@ -56,7 +56,7 @@ MAKE_ARGS="ARCH=arm64 \
            CROSS_COMPILE=aarch64-linux-gnu- \
            CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
            CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
-           LD=ld.lld \
+           LD=aarch64-linux-gnu-ld \
            AR=llvm-ar \
            NM=llvm-nm \
            OBJCOPY=llvm-objcopy \

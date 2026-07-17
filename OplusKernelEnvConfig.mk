@@ -139,6 +139,7 @@ ifeq ($(OPLUS_FEATURE_GAMMA_SWITCH_KERNEL), yes)
      ALLOWED_MCROS += OPLUS_FEATURE_GAMMA_SWITCH
 endif
 
+export $(ALLOWED_MCROS)
 
 $(foreach myfeature,$(ALLOWED_MCROS),\
          $(warning make $(myfeature) to be a macro here) \
