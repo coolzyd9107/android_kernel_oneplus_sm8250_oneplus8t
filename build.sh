@@ -97,7 +97,7 @@ clang --version
 KSU_ZIP_STR=NoKernelSU
 if [ "$2" == "ksu" ]; then
     KSU_ENABLE=1
-    KSU_ZIP_STR=ReSukiSU-SuSFS
+    KSU_ZIP_STR=ReSukiSU-Manual
 else
     KSU_ENABLE=0
 fi
@@ -131,16 +131,11 @@ if [ $KSU_ENABLE -eq 1 ]; then
     scripts/config --file out/.config \
     -e KSU \
     -e THREAD_INFO_IN_TASK \
-    -e KSU_SUSFS \
-    -e KSU_SUSFS_SUS_PATH \
-    -e KSU_SUSFS_SUS_MOUNT \
-    -e KSU_SUSFS_SUS_KSTAT \
-    -e KSU_SUSFS_SPOOF_UNAME \
-    -e KSU_SUSFS_ENABLE_LOG \
-    -e KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS \
-    -e KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG \
-    -e KSU_SUSFS_OPEN_REDIRECT \
-    -e KSU_SUSFS_SUS_MAP \
+    -e KSU_MANUAL_HOOK \
+    -e KSU_MANUAL_HOOK_AUTO_SETUID_HOOK \
+    -e KSU_MANUAL_HOOK_AUTO_INITRC_HOOK \
+    -e KSU_MANUAL_HOOK_AUTO_INPUT_HOOK \
+    -d KSU_SUSFS \
     -e KSU_MULTI_MANAGER_SUPPORT
 else
     scripts/config --file out/.config -d KSU
