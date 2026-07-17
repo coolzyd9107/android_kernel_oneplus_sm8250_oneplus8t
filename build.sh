@@ -52,7 +52,6 @@ MAKE_ARGS="ARCH=arm64 \
            CC=clang \
            HOSTCC=gcc \
            HOSTCXX=g++ \
-           LLVM_IAS=1 \
            CLANG_TRIPLE=aarch64-linux-gnu- \
            CROSS_COMPILE=aarch64-linux-gnu- \
            CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
