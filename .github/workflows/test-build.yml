@@ -29,7 +29,7 @@ on:
 jobs:
   build:
     name: Build Kernel for ${{ inputs.device }} (${{ inputs.ksu && 'KSU' || 'NoKSU' }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout Source
@@ -48,7 +48,7 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential git curl wget bison flex zip bc cpio libssl-dev ccache python3-minimal python-is-python3 libelf-dev
+        sudo apt-get install -y build-essential git curl bison flex zip bc cpio libssl-dev ccache python3-minimal python-is-python3 libelf-dev libtinfo5 gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu gcc-arm-linux-gnueabi binutils-arm-linux-gnueabi
 
     - name: Setup Cache (ccache)
       uses: actions/cache@v4
@@ -59,12 +59,14 @@ jobs:
           kernel-ccache-${{ inputs.device }}-
           kernel-ccache-
 
-    - name: Setup Toolchain (ZyC-Clang 16)
+    - name: Setup Toolchain (Snapdragon LLVM 10.0.7)
       run: |
         mkdir -p $HOME/zyc-clang
-        cd $HOME/zyc-clang
-        wget -q https://github.com/ZyCromerZ/Clang/releases/download/16.0.6-20260510-release/Clang-16.0.6-20260510.tar.gz
-        tar -zxf Clang-16.0.6-20260510.tar.gz
+        curl -LSs https://github.com/sticpaper/Snapdragon-LLVM-ARM-Compiler-10.0.7-for-Android-NDK/archive/a16fec82a8deaf8f742ea54f8de98c021af200d4.tar.gz \
+          | tar -xz --strip-components=1 -C $HOME/zyc-clang
+        $HOME/zyc-clang/bin/clang --version
+        aarch64-linux-gnu-ld --version
+        arm-linux-gnueabi-ld --version
 
     - name: Build Kernel
       run: |
@@ -84,5 +86,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Kernel-${{ inputs.device }}-${{ inputs.ksu && 'KSU' || 'NoKSU' }}-${{ github.run_number }}
-        path: ./out/*.zip
+        path: ./*.zip
         if-no-files-found: error
