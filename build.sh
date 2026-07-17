@@ -146,6 +146,7 @@ scripts/config --file out/.config \
 
 # 适用于一加 OOS/COS 的性能与底层配置调整
 scripts/config --file out/.config \
+    -e BUILD_ARM64_DT_OVERLAY \
     -e PERF_CRITICAL_RT_TASK \
     -e OVERLAY_FS \
     -d LTO_CLANG \
