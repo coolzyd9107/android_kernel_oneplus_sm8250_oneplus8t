@@ -47,6 +47,7 @@ export CXX="clang++"
 
 MAKE_ARGS="ARCH=arm64 \
            SUBARCH=arm64 \
+           BRAND_SHOW_FLAG=oneplus \
            O=out \
            CC=clang \
            HOSTCC=gcc \
