@@ -46,6 +46,7 @@ jobs:
         git -C $RUNNER_TEMP/oneplus-modules fetch --depth=1 origin 0a301570ef70f6f9bfe1840451c9d41f5ddce6b8
         git -C $RUNNER_TEMP/oneplus-modules checkout --detach 0a301570ef70f6f9bfe1840451c9d41f5ddce6b8
         mv $RUNNER_TEMP/oneplus-modules/vendor $GITHUB_WORKSPACE/../../vendor
+        mv $RUNNER_TEMP/oneplus-modules/kernel/msm-4.19/techpack/{camera,display,video} $GITHUB_WORKSPACE/techpack/
         ln -s $GITHUB_WORKSPACE $GITHUB_WORKSPACE/kernel/msm-4.19
 
     - name: Cleanup Disk Space
