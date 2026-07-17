@@ -38,6 +38,15 @@ jobs:
         fetch-depth: 1
         submodules: 'recursive'
 
+    - name: Checkout OnePlus Vendor Modules
+      run: |
+        git clone --depth=1 \
+          https://github.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8250.git \
+          $RUNNER_TEMP/oneplus-modules
+        git -C $RUNNER_TEMP/oneplus-modules fetch --depth=1 origin 0a301570ef70f6f9bfe1840451c9d41f5ddce6b8
+        git -C $RUNNER_TEMP/oneplus-modules checkout --detach 0a301570ef70f6f9bfe1840451c9d41f5ddce6b8
+        mv $RUNNER_TEMP/oneplus-modules/vendor $GITHUB_WORKSPACE/../../vendor
+
     - name: Cleanup Disk Space
       run: |
         sudo rm -rf /usr/share/dotnet
