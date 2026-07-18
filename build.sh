@@ -27,13 +27,13 @@ fi
 echo "TOOLCHAIN_PATH: [$TOOLCHAIN_PATH]"
 export PATH="$TOOLCHAIN_PATH:$PATH"
 
-if ! command -v aarch64-linux-gnu-ld >/dev/null 2>&1; then
-    echo "[aarch64-linux-gnu-ld] does not exist, please check your environment."
+if ! command -v aarch64-linux-androidkernel-ld >/dev/null 2>&1; then
+    echo "[aarch64-linux-androidkernel-ld] does not exist, please check your environment."
     exit 1
 fi
 
-if ! command -v arm-linux-gnueabi-ld >/dev/null 2>&1; then
-    echo "[arm-linux-gnueabi-ld] does not exist, please check your environment."
+if ! command -v arm-linux-androideabi-ld >/dev/null 2>&1; then
+    echo "[arm-linux-androideabi-ld] does not exist, please check your environment."
     exit 1
 fi
 
@@ -53,15 +53,9 @@ MAKE_ARGS="ARCH=arm64 \
            HOSTCC=gcc \
            HOSTCXX=g++ \
            CLANG_TRIPLE=aarch64-linux-gnu- \
-           CROSS_COMPILE=aarch64-linux-gnu- \
-           CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-           CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
-           LD=aarch64-linux-gnu-ld \
-           AR=llvm-ar \
-           NM=llvm-nm \
-           OBJCOPY=llvm-objcopy \
-           OBJDUMP=llvm-objdump \
-           STRIP=llvm-strip"
+           CROSS_COMPILE=aarch64-linux-androidkernel- \
+           CROSS_COMPILE_ARM32=arm-linux-androideabi- \
+           CROSS_COMPILE_COMPAT=arm-linux-androideabi-"
 
 if [ "$1" == "j1" ]; then
     make $MAKE_ARGS -j1
@@ -142,7 +136,6 @@ scripts/config --file out/.config \
 # 适用于一加 OOS/COS 的性能与底层配置调整
 scripts/config --file out/.config \
     -e BUILD_ARM64_DT_OVERLAY \
-    -e MODULE_REL_CRCS \
     -e PERF_CRITICAL_RT_TASK \
     -e OVERLAY_FS \
     -d LTO_CLANG \

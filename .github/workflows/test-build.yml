@@ -62,16 +62,23 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential git curl bison flex zip bc cpio libssl-dev python3-minimal python-is-python3 libelf-dev libtinfo5 gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu gcc-arm-linux-gnueabi binutils-arm-linux-gnueabi
+        sudo apt-get install -y build-essential git curl bison flex zip bc cpio libssl-dev python3-minimal python-is-python3 libelf-dev libtinfo5
 
-    - name: Setup Toolchain (Snapdragon LLVM 10.0.7)
+    - name: Setup Toolchains (Snapdragon LLVM 10.0.7 + GCC 4.9)
       run: |
         mkdir -p $HOME/zyc-clang
         curl -LSs https://github.com/sticpaper/Snapdragon-LLVM-ARM-Compiler-10.0.7-for-Android-NDK/archive/a16fec82a8deaf8f742ea54f8de98c021af200d4.tar.gz \
           | tar -xz --strip-components=1 -C $HOME/zyc-clang
+        mkdir -p $HOME/gcc64 $HOME/gcc32
+        curl -LSs https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9/archive/5e030eafe024784a73cdf47e6936ac0dbfc763dc.tar.gz \
+          | tar -xz --strip-components=1 -C $HOME/gcc64
+        curl -LSs https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9/archive/111258a10e017f067b27e6cfcea7619d753f3309.tar.gz \
+          | tar -xz --strip-components=1 -C $HOME/gcc32
+        echo "$HOME/gcc64/bin" >> $GITHUB_PATH
+        echo "$HOME/gcc32/bin" >> $GITHUB_PATH
         $HOME/zyc-clang/bin/clang --version
-        aarch64-linux-gnu-ld --version
-        arm-linux-gnueabi-ld --version
+        $HOME/gcc64/bin/aarch64-linux-androidkernel-ld --version
+        $HOME/gcc32/bin/arm-linux-androideabi-ld --version
 
     - name: Build Kernel
       run: |
