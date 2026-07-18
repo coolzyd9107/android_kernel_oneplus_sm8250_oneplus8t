@@ -55,7 +55,8 @@ MAKE_ARGS="ARCH=arm64 \
            CLANG_TRIPLE=aarch64-linux-gnu- \
            CROSS_COMPILE=aarch64-linux-androidkernel- \
            CROSS_COMPILE_ARM32=arm-linux-androideabi- \
-           CROSS_COMPILE_COMPAT=arm-linux-androideabi-"
+           CROSS_COMPILE_COMPAT=arm-linux-androideabi- \
+           OBJCOPY=llvm-objcopy"
 
 if [ "$1" == "j1" ]; then
     make $MAKE_ARGS -j1
