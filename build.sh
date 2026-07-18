@@ -109,8 +109,11 @@ echo "Cleaning..."
 rm -rf out/
 rm -rf anykernel/
 
-echo "Clone AnyKernel3 for packing kernel"
-git clone https://github.com/AstideLabs/AnyKernel3 -b master --single-branch --depth=1 anykernel
+echo "Preparing AnyKernel3 for packing kernel"
+mkdir -p anykernel
+curl -LSs https://github.com/osm0sis/AnyKernel3/archive/1c9a500dd4aa8081952523126e97eb155aed941b.tar.gz \
+    | tar -xz --strip-components=1 -C anykernel
+cp anykernel-oneplus.sh anykernel/anykernel.sh
 
 # ------------- Building for OxygenOS/ColorOS (OOS/COS) -------------
 
@@ -155,14 +158,10 @@ else
 fi
 
 echo "Generating [out/arch/arm64/boot/dtb]......"
-find out/arch/arm64/boot/dts -name '*.dtb' -exec cat {} + >out/arch/arm64/boot/dtb
+cat out/arch/arm64/boot/dts/vendor/*/*.dtb >out/arch/arm64/boot/dtb
 
-rm -rf anykernel/kernels/
-mkdir -p anykernel/kernels/oos/
-
-cp out/arch/arm64/boot/Image anykernel/kernels/oos/
-cp out/arch/arm64/boot/dtb anykernel/kernels/oos/
-cp out/arch/arm64/boot/dtbo.img anykernel/kernels/oos/
+cp out/arch/arm64/boot/Image anykernel/
+cp out/arch/arm64/boot/dtb anykernel/
 
 echo "Build for OOS/COS finished."
 
